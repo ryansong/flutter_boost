@@ -2,7 +2,7 @@
   <img src="flutter_boost.png">
    <b></b><br>
   <a href="README_CN.md">中文文档</a>
-  <br><br>
+  <a href="https://mp.weixin.qq.com/s?__biz=MzU4MDUxOTI5NA==&mid=2247484367&idx=1&sn=fcbc485f068dae5de9f68d52607ea08f&chksm=fd54d7deca235ec86249a9e3714ec18be8b2d6dc580cae19e4e5113533a6c5b44dfa5813c4c3&scene=0&subscene=131&clicktime=1551942425&ascene=7&devicetype=android-28&version=2700033b&nettype=ctnet&abtest_cookie=BAABAAoACwASABMABAAklx4AVpkeAMSZHgDWmR4AAAA%3D&lang=zh_CN&pass_ticket=1qvHqOsbLBHv3wwAcw577EHhNjg6EKXqTfnOiFbbbaw%3D&wx_header=1">中文介绍</a>
 </p>
 
 # FlutterBoost
@@ -19,18 +19,18 @@ You need to add Flutter to your project before moving on.
 
 Open you pubspec.yaml and add the following line to dependencies:
 
-Before release 1.0
-
 ```java
-flutter_boost: 0.0.34
+flutter_boost: ^0.0.411
 ```
 
-
-After Release 1.0
-
+or you could rely directly on a Github project tag, for example(recommended)
 ```java
-flutter_boost: ^0.0.39
+flutter_boost:
+        git:
+            url: 'https://github.com/alibaba/flutter_boost.git'
+            ref: '0.0.411'
 ```
+
 
 
 ## Integration with Flutter code.
@@ -69,6 +69,8 @@ class _MyAppState extends State<MyApp> {
 
 
 ## Integration with iOS code.
+
+Note: You need to add libc++ into "Linked Frameworks and Libraries" 
 
 Use FLBFlutterAppDelegate as the superclass of your AppDelegate
 

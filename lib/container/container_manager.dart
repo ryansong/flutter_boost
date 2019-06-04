@@ -37,7 +37,11 @@ typedef BoostContainerObserver = void Function(
 @immutable
 class BoostContainerManager extends StatefulWidget {
   final Navigator initNavigator;
-  const BoostContainerManager({Key key, this.initNavigator}) : super(key: key);
+  final PrePushRoute prePushRoute;
+  final PostPushRoute postPushRoute;
+  const BoostContainerManager(
+      {Key key, this.initNavigator, this.prePushRoute, this.postPushRoute})
+      : super(key: key);
 
   @override
   ContainerManagerState createState() => ContainerManagerState();
@@ -69,6 +73,10 @@ class ContainerManagerState extends State<BoostContainerManager> {
 
   String _lastShownContainer;
 
+  PrePushRoute get prePushRoute => widget.prePushRoute;
+
+  PostPushRoute get postPushRoute => widget.postPushRoute;
+
   bool get foreground => _foreground;
 
   ManagerNavigatorObserver get navigatorObserver => _navigatorObserver;
@@ -91,6 +99,10 @@ class ContainerManagerState extends State<BoostContainerManager> {
 
     assert(widget.initNavigator != null);
     _onstage = BoostContainer.copy(widget.initNavigator);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      setState(() {});
+    });
   }
 
   void updateFocuse() {
@@ -201,7 +213,6 @@ class ContainerManagerState extends State<BoostContainerManager> {
     final int index = _offstage.indexWhere((BoostContainer container) =>
         container.settings.uniqueId == settings.uniqueId);
     if (index > -1) {
-      final BoostContainerState old = _stateOf(_onstage);
       _offstage.add(_onstage);
       _onstage = _offstage.removeAt(index);
 
@@ -244,7 +255,6 @@ class ContainerManagerState extends State<BoostContainerManager> {
     assert(_offstage.every((BoostContainer container) =>
         container.settings.uniqueId != settings.uniqueId));
 
-    final BoostContainerState old = _stateOf(_onstage);
     _offstage.add(_onstage);
     _onstage = BoostContainer.obtain(widget.initNavigator, settings);
 
@@ -261,14 +271,14 @@ class ContainerManagerState extends State<BoostContainerManager> {
   void pop() {
     assert(canPop());
 
-    final BoostContainerState old = _stateOf(_onstage);
+    final BoostContainer old = _onstage;
     _onstage = _offstage.removeLast();
     setState(() {});
 
     for (BoostContainerObserver observer in FlutterBoost
         .singleton.observersHolder
         .observersOf<BoostContainerObserver>()) {
-      observer(ContainerOperation.Pop, _onstage.settings);
+      observer(ContainerOperation.Pop, old.settings);
     }
 
     Logger.log('ContainerObserver didPop');
@@ -289,7 +299,7 @@ class ContainerManagerState extends State<BoostContainerManager> {
         for (BoostContainerObserver observer in FlutterBoost
             .singleton.observersHolder
             .observersOf<BoostContainerObserver>()) {
-          observer(ContainerOperation.Remove, _onstage.settings);
+          observer(ContainerOperation.Remove, container.settings);
         }
 
         Logger.log('ContainerObserver didRemove');
